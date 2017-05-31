@@ -149,7 +149,7 @@ function createService(serviceName, plan, instanceName, options = {}){
 
 
 function deleteApp(appName){
-  return cmdSync(`cf delete ${appName} --f`);
+  return cmdSync(`cf delete ${appName} -f`);
 }
 
 
