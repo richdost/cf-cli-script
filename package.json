@@ -1,5 +1,5 @@
 {
-  "name": "cf-script",
+  "name": "cf-cli-script",
   "version": "0.0.1",
   "description": "Support for scripting Cloud Foundry in javascript using the CLI.",
   "main": "scripting.js",
