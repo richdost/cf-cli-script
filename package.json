@@ -1,0 +1,22 @@
+{
+  "name": "cf-script",
+  "version": "0.0.1",
+  "description": "Support for scripting Cloud Foundry in javascript using the CLI.",
+  "main": "scripting.js",
+  "scripts": {
+    "test": "mocha",
+    "lint": "eslint ./*.js ./**/*.js"
+  },
+  "author": "Rich Dost",
+  "license": "MIT",
+  "dependencies": {
+    "jsonfile": "^3.0.0",
+    "readline-sync": "^1.4.7",
+    "request": "^2.81.0",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "mocha": "^3.4.1"
+  }
+}
