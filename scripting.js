@@ -158,13 +158,21 @@ function createService(serviceName, plan, instanceName, options = {}){
 }
 
 
-function deleteApp(appName){
+function deleteAppSync(appName){
   return cmdSync(`cf delete ${appName} -f`);
 }
 
+function deleteApp(appName){
+  return cmd(`cf delete ${appName} -f`);
+}
+
+
+function deleteServiceSync(serviceName){
+  return cmdSync(`cf delete-service ${serviceName} -f`);
+}
 
 function deleteService(serviceName){
-  return cmdSync(`cf delete-service ${serviceName} -f`);
+  return cmd(`cf delete-service ${serviceName} -f`);
 }
 
 // TODO return map instead of array
@@ -187,12 +195,13 @@ function getServiceInfo(serviceName){
 
 module.exports = {
   push, pushSync,
+  deleteApp, deleteAppSync,
 
-  getApps, deleteApp,
+  getApps, 
 
   getServices,
   createService,
-  deleteService,
+  deleteService, deleteServiceSync,
 
   getServiceInfo,
 
