@@ -140,12 +140,19 @@ function push(name, options){
 
 function createServiceSync(serviceName, plan, instanceName, options = {}){
   console.log('entering cfScript.createServiceSync for serviceName:' + serviceName);
+  console.log('entering cfScript.createServiceSync for options:' + options);
+
+  // errors
+  // TODO handle these in cf-formation. Should not know about service specifics here.
+  if (serviceName == 'predix-uaa' && !(options.c && options.c.adminClientSecret)){
+    throw new Error('Service predix-uaa requires options.c = { adminClientSecret: <secret> }');
+  }
+  if (serviceName == 'predix-asset' && !(options.c && options.c.trustedIssuerIds)){
+    throw new Error('Service predix-asset requires options.c = { trustedIssuerIds: [ <uaa-url> ]}');
+  }
+
   var cOption = (options.c && typeof options.c == 'string') ? "-c '" + JSON.stringify(options.c) + "'" : '';
   var tOption = (options.t && typeof options.t == 'string') ? "-t '" + JSON.stringify(options.t) + "'" : '';
-
-  // errors - TODO handle these in formation
-  if (serviceName == 'predix-uaa' && !configOption) throw new Error('Service predix-uaa requires options.c = { adminClientSecret: <secret> }');
-  if (serviceName == 'predix-asset' && !configOption) throw new Error('Service predix-asset requires options.c = { trustedIssuerIds: [ <uaa-url> ]}');
 
   var s = `cf create-service ${serviceName} ${plan} ${instanceName} ${cOption} ${tOption}`;
   var output = cmdSync(s);
@@ -155,20 +162,22 @@ function createServiceSync(serviceName, plan, instanceName, options = {}){
 
 // TODO unit tests
 function createService(serviceName, plan, instanceName, options = {}){
+
   console.log('entering cfScript.createService for serviceName:' + serviceName);
+
+  // errors
+  // TODO handle these in cf-formation. Should not know about service specifics here.
+  if (serviceName == 'predix-uaa' && !(options.c && options.c.adminClientSecret)){
+    return Promise.reject('Service predix-uaa requires options.c = { adminClientSecret: <secret> }');
+  }
+  if (serviceName == 'predix-asset' && !(options.c && options.c.trustedIssuerIds)){
+    return Promise.reject('Service predix-asset requires options.c = { trustedIssuerIds: [ <uaa-url> ]}');
+  }
+
   var cOption = (options.c && typeof options.c == 'string') ? "-c '" + JSON.stringify(options.c) + "'" : '';
   var tOption = (options.t && typeof options.t == 'string') ? "-t '" + JSON.stringify(options.t) + "'" : '';
 
   return new Promise((resolve, reject) => {
-  // errors - TODO handle these in formation
-    if (serviceName == 'predix-uaa' && !configOption){
-      reject('Service predix-uaa requires options.c = { adminClientSecret: <secret> }');
-      return;
-    }
-    if (serviceName == 'predix-asset' && !configOption){
-      reject('Service predix-asset requires options.c = { trustedIssuerIds: [ <uaa-url> ]}');
-      return;
-    }
     cmd(`cf create-service ${serviceName} ${plan} ${instanceName} ${cOption} ${tOption}`)
     .catch(reject)
     .then(output => {
