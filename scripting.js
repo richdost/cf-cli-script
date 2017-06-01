@@ -51,6 +51,44 @@ function getServices(){
 // TODO rename to getAppsInfo
 // TODO return map instead of array
 function getApps(){
+  return new Promise((resolve, reject) => {
+
+    cmd('cf a').catch(reject).then(output => {
+      if (!output){
+        reject('Unexpected output - error?');
+        return;
+      }
+      var rows = output.split('\n');
+      if (!rows[0].startsWith('Getting apps in org ')){
+        reject('Unexpected output - cf version change?');
+        return;
+      }
+      rows.forEach(function(aRow, i){
+        rows[i] = cleanArray(aRow.split(/\s/));
+      });  // TODO map?
+
+      var org = rows[0][4];
+      var space = rows[0][7];
+
+      var app = [];
+      var tableOfApps = cleanArray(rows.slice(4));
+      tableOfApps.forEach(anApp => {
+        app.push({
+          name: anApp[0],
+          state: anApp[1],
+          instances: anApp[2],
+          memory: anApp[3],
+          disk: anApp[4],
+          url: anApp[5],
+        });
+      });
+      
+      resolve({org, space, app});
+    });
+  });
+}
+
+function getAppsSync(){
   var output = cmdSync('cf a');
   if (!output) throw new Error('Unexpected output - error?');
   var rows = output.split('\n');
@@ -227,7 +265,7 @@ module.exports = {
   push, pushSync,
   deleteApp, deleteAppSync,
 
-  getApps, 
+  getApps, getAppsSync, 
 
   getServices,
   createService, createServiceSync,
