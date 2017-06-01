@@ -88,7 +88,7 @@ function getApps(){
 // Example:  sdk.scripting.push('my-app',{ path: '~/temp.html','no-start':null });
 //
 // NOTE:: The path should point to the directory, not to e.g. an html file itself.
-function push(name, options){
+function getPushOptionsString(options){
   const singleTermOption = {
     'no-start': true,
     'no-manifest': true,
@@ -118,7 +118,17 @@ function push(name, options){
     var dashes = key.length == 1 ? '-' : '--';
     optionString += ' ' + dashes + key + ' ' + value;
   }
+  return optionString;
+}
+
+function pushSync(name, options){
+  var optionString = getPushOptionsString(options);
   return cmdSync(`cf push ${name} ${optionString}`, options.timeout ? options.timeout : 120000);
+}
+
+function push(name, options){
+  var optionString = getPushOptionsString(options);
+  return cmd(`cf push ${name} ${optionString}`);
 }
 
 //  cmdSync(`cf create-service predix-uaa ${uaa.plan} ${uaa.name} -c '{"adminClientSecret":"${uaa.secret}"}'`);
@@ -176,7 +186,7 @@ function getServiceInfo(serviceName){
 }
 
 module.exports = {
-  push,
+  push, pushSync,
 
   getApps, deleteApp,
 
