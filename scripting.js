@@ -151,8 +151,8 @@ function createServiceSync(serviceName, plan, instanceName, options = {}){
     throw new Error('Service predix-asset requires options.c = { trustedIssuerIds: [ <uaa-url> ]}');
   }
 
-  var cOption = (options.c && typeof options.c == 'string') ? "-c '" + JSON.stringify(options.c) + "'" : '';
-  var tOption = (options.t && typeof options.t == 'string') ? "-t '" + JSON.stringify(options.t) + "'" : '';
+  var cOption = options.c ? "-c '" + JSON.stringify(options.c) + "'" : '';
+  var tOption = options.t ? "-t '" + JSON.stringify(options.t) + "'" : '';
 
   var s = `cf create-service ${serviceName} ${plan} ${instanceName} ${cOption} ${tOption}`;
   var output = cmdSync(s);
@@ -174,8 +174,8 @@ function createService(serviceName, plan, instanceName, options = {}){
     return Promise.reject('Service predix-asset requires options.c = { trustedIssuerIds: [ <uaa-url> ]}');
   }
 
-  var cOption = (options.c && typeof options.c == 'string') ? "-c '" + JSON.stringify(options.c) + "'" : '';
-  var tOption = (options.t && typeof options.t == 'string') ? "-t '" + JSON.stringify(options.t) + "'" : '';
+  var cOption = options.c ? "-c '" + JSON.stringify(options.c) + "'" : '';
+  var tOption = options.t ? "-t '" + JSON.stringify(options.t) + "'" : '';
 
   return new Promise((resolve, reject) => {
     cmd(`cf create-service ${serviceName} ${plan} ${instanceName} ${cOption} ${tOption}`)
