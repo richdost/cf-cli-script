@@ -291,23 +291,21 @@ function getServiceInfoSync(serviceName){
 function getServiceInfo(serviceName){
   var keyName = serviceName + '-key-' + uuid.v1();
   return new Promise((resolve, reject) => {
-
-      cmd(`cf create-service-key ${serviceName} ${keyName}`).catch(reject).then(output => {
-        cmd(`cf service-key ${serviceName} ${keyName}`)
-        .catch(error =>{
-          cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
-          .catch(() => reject(error)).then(() => reject(error));
-        })
-        .then(output => {
-          var rows = output.split('\n');
-          rows = cleanArray(rows.slice(1));
-          var info = rows.join('');
-          info = JSON.parse(info);
-          cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
-          .catch(() => resolve(info)).then(() => resolve(info));
-        });
+    cmd(`cf create-service-key ${serviceName} ${keyName}`).catch(reject).then(output => {
+      cmd(`cf service-key ${serviceName} ${keyName}`)
+      .catch(error =>{
+        cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
+        .catch(() => reject(error)).then(() => reject(error));
+      })
+      .then(output => {
+        var rows = output.split('\n');
+        rows = cleanArray(rows.slice(1));
+        var info = rows.join('');
+        info = JSON.parse(info);
+        cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
+        .catch(() => resolve(info)).then(() => resolve(info));
       });
-    }
+    });
   });
 }
 
