@@ -19,7 +19,7 @@ catch (e){
 }
 
 // Equivalent to cf s.
-function getServices(){
+function getServicesSync(){
   var output = cmdSync('cf s');
   var rows = output.split('\n');
   if (!rows[0].startsWith('Getting services in org ')) throw new Error('Unexpected output - cf version change?');
@@ -45,6 +45,35 @@ function getServices(){
     space,
     service,
   };
+}
+
+// Equivalent to cf s.
+function getServices(){
+  cmd('cf s').catch(reject).then(output => {
+    var rows = output.split('\n');
+    if (!rows[0].startsWith('Getting services in org ')){
+      reject('Unexpected output - cf version change?');
+      return;
+    }
+    rows.forEach((aRow, i) => {
+      rows[i] = cleanArray(aRow.split(/\s/));
+    });
+
+    var org = rows[0][4];
+    var space = rows[0][7];
+
+    var service = [];
+    var tableOfServices = cleanArray(rows.slice(4));
+    tableOfServices.forEach(aService => {
+      service.push({
+        instance: aService[0],  // TODO change instance to name
+        name: aService[0],
+        service: aService[1],
+        plan: aService[2],
+      });
+    });
+    resolve({org, space, service});
+  });
 }
 
 // Equivalent to cf a
@@ -82,7 +111,7 @@ function getApps(){
           url: anApp[5],
         });
       });
-      
+
       resolve({org, space, app});
     });
   });
@@ -225,7 +254,6 @@ function createService(serviceName, plan, instanceName, options = {}){
   });
 }
 
-
 function deleteAppSync(appName){
   return cmdSync(`cf delete ${appName} -f`);
 }
@@ -233,7 +261,6 @@ function deleteAppSync(appName){
 function deleteApp(appName){
   return cmd(`cf delete ${appName} -f`);
 }
-
 
 function deleteServiceSync(serviceName){
   return cmdSync(`cf delete-service ${serviceName} -f`);
@@ -244,9 +271,9 @@ function deleteService(serviceName){
 }
 
 // TODO return map instead of array
-function getServiceInfo(serviceName){
+function getServiceInfoSync(serviceName){
   try {
-    var keyName = 'sdk-temp-key-' + uuid.v1();
+    var keyName = serviceName + '-key-' + uuid.v1();
     cmdSync(`cf create-service-key ${serviceName} ${keyName}`);
     var output = cmdSync(`cf service-key ${serviceName} ${keyName}`);
     cmdSync(`cf delete-service-key ${serviceName} ${keyName} -f`);
@@ -261,17 +288,40 @@ function getServiceInfo(serviceName){
   }
 }
 
+function getServiceInfo(serviceName){
+  var keyName = serviceName + '-key-' + uuid.v1();
+  return new Promise((resolve, reject) => {
+
+      cmd(`cf create-service-key ${serviceName} ${keyName}`).catch(reject).then(output => {
+        cmd(`cf service-key ${serviceName} ${keyName}`)
+        .catch(error =>{
+          cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
+          .catch(() => reject(error)).then(() => reject(error));
+        })
+        .then(output => {
+          var rows = output.split('\n');
+          rows = cleanArray(rows.slice(1));
+          var info = rows.join('');
+          info = JSON.parse(info);
+          cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
+          .catch(() => resolve(info)).then(() => resolve(info));
+        });
+      });
+    }
+  });
+}
+
 module.exports = {
   push, pushSync,
   deleteApp, deleteAppSync,
 
   getApps, getAppsSync, 
 
-  getServices,
+  getServices, getServicesSync,
   createService, createServiceSync,
   deleteService, deleteServiceSync,
 
-  getServiceInfo,
+  getServiceInfo, getServiceInfoSync,
 
   readlineSync,
 
