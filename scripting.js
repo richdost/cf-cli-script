@@ -49,30 +49,41 @@ function getServicesSync(){
 
 // Equivalent to cf s.
 function getServices(){
-  cmd('cf s').catch(reject).then(output => {
-    var rows = output.split('\n');
-    if (!rows[0].startsWith('Getting services in org ')){
-      reject('Unexpected output - cf version change?');
-      return;
-    }
-    rows.forEach((aRow, i) => {
-      rows[i] = cleanArray(aRow.split(/\s/));
-    });
-
-    var org = rows[0][4];
-    var space = rows[0][7];
-
-    var service = [];
-    var tableOfServices = cleanArray(rows.slice(4));
-    tableOfServices.forEach(aService => {
-      service.push({
-        instance: aService[0],  // TODO change instance to name
-        name: aService[0],
-        service: aService[1],
-        plan: aService[2],
+  return new Promise((resolve, reject) => {
+    // console.log('entering getServices');
+    cmd('cf s')
+    .catch(error => {
+      // console.log('Error in getServices:' + error);
+      reject(error);
+    })
+    .then(output => {
+      // console.log('in then clause of getServices');
+      var rows = output.split('\n');
+      if (!rows[0].startsWith('Getting services in org ')){
+        reject('Unexpected output - cf version change?');
+        return;
+      }
+      rows.forEach((aRow, i) => {
+        rows[i] = cleanArray(aRow.split(/\s/));
       });
+
+      var org = rows[0][4];
+      var space = rows[0][7];
+
+      var service = [];
+      var tableOfServices = cleanArray(rows.slice(4));
+      tableOfServices.forEach(aService => {
+        service.push({
+          instance: aService[0],  // TODO change instance to name
+          name: aService[0],
+          service: aService[1],
+          plan: aService[2],
+        });
+      });
+      // console.log('resolving getServices');
+      resolve({org, space, service});
     });
-    resolve({org, space, service});
+
   });
 }
 
@@ -206,8 +217,8 @@ function push(name, options){
 // For predix-asset the -c { trustedIssuerIds: [ "myUaaUrl" ]}
 
 function createServiceSync(serviceName, plan, instanceName, options = {}){
-  console.log('entering cfScript.createServiceSync for serviceName:' + serviceName);
-  console.log('entering cfScript.createServiceSync for options:' + options);
+  // console.log('entering cfScript.createServiceSync for serviceName:' + serviceName);
+  // console.log('entering cfScript.createServiceSync for options:' + options);
 
   // errors
   // TODO handle these in cf-formation. Should not know about service specifics here.
@@ -230,7 +241,7 @@ function createServiceSync(serviceName, plan, instanceName, options = {}){
 // TODO unit tests
 function createService(serviceName, plan, instanceName, options = {}){
 
-  console.log('entering cfScript.createService for serviceName:' + serviceName);
+  // console.log('entering cfScript.createService for serviceName:' + serviceName);
 
   // errors
   // TODO handle these in cf-formation. Should not know about service specifics here.
@@ -291,7 +302,9 @@ function getServiceInfoSync(serviceName){
 function getServiceInfo(serviceName){
   var keyName = serviceName + '-key-' + uuid.v1();
   return new Promise((resolve, reject) => {
-    cmd(`cf create-service-key ${serviceName} ${keyName}`).catch(reject).then(output => {
+    cmd(`cf create-service-key ${serviceName} ${keyName}`)
+    .catch(reject)
+    .then(() => {
       cmd(`cf service-key ${serviceName} ${keyName}`)
       .catch(error =>{
         cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
@@ -303,7 +316,8 @@ function getServiceInfo(serviceName){
         var info = rows.join('');
         info = JSON.parse(info);
         cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
-        .catch(() => resolve(info)).then(() => resolve(info));
+        .catch(() => resolve(info))
+        .then(() => resolve(info));
       });
     });
   });
