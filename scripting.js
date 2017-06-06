@@ -18,6 +18,19 @@ catch (e){
   process.exit(1);
 }
 
+
+function loginSync(endpoint, org, user,password=null){
+  var s = 'cf login';
+  s = endpoint ? s + ' -a "' + endpoint + '"' : s;
+  s = user ? s + ' -u "' + user + '"'  : s;
+  s = org ? s + ' -o "' + org + '"'  : s;
+  s = password ? s + ' -p "' + password + '"'  : s;
+  var output = cmdSync(s);
+  //console.log('loginSync output:' + output);
+  return output && output.indexOf('OK')
+}
+
+
 // Equivalent to cf s.
 function getServicesSync(){
   var output = cmdSync('cf s');
@@ -324,6 +337,8 @@ function getServiceInfo(serviceName){
 }
 
 module.exports = {
+  loginSync,
+
   push, pushSync,
   deleteApp, deleteAppSync,
 
