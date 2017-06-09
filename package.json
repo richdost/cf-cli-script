@@ -4,7 +4,7 @@
   "description": "Support for scripting Cloud Foundry in javascript using the CLI.",
   "main": "scripting.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --timeout 9000",
+    "test": "./node_modules/.bin/mocha --timeout 100000",
     "lint": "eslint ./*.js ./**/*.js"
   },
   "author": "Rich Dost",

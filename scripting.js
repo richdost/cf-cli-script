@@ -18,6 +18,50 @@ catch (e){
   process.exit(1);
 }
 
+function setEnv(appName,name,value){
+  return new Promise((resolve, reject) => {
+    cmd(`cf set-env ${appName} ${name} ${value}`)
+    .catch(reject)
+    .then(output => {
+            console.log('cf set-env output:\n' + output);
+
+      var rows = output && output.split('\n');
+      var isOK = rows && rows[1] && rows[1].startsWith('OK');
+      if (isOK) resolve();
+      else reject();
+    });
+  });
+}
+
+
+function getEnv(appName){
+  return new Promise((resolve, reject) => {
+    cmd('cf env ' + appName)
+    .catch(reject)
+    .then(output => {
+            console.log('cf set-env output:\n' + output);
+      var rows = output && output.split('\n');
+      var isOK = rows && rows[1] && rows[1].startsWith('OK');
+      if (isOK) resolve(output);
+      else reject(output);
+    });
+  });
+}
+
+function startApp(appName){
+  return new Promise((resolve, reject) => {
+    cmd('cf start ' + appName)
+    .catch(reject)
+    .then(output => {
+      var rows = output && output.split('\n');
+      resolve(rows && rows[1] && rows[1].startsWith('OK'));
+    });
+  });
+}
+
+// function stop
+
+
 
 function loginSync(endpoint, org, user,password=null){
   var s = 'cf login';
@@ -217,7 +261,7 @@ function pushSync(name, options){
   return cmdSync(`cf push ${name} ${optionString}`, options.timeout ? options.timeout : 120000);
 }
 
-function push(name, options){
+function push(name, options = {}){
   var optionString = getPushOptionsString(options);
   return cmd(`cf push ${name} ${optionString}`);
 }
@@ -342,13 +386,16 @@ module.exports = {
   push, pushSync,
   deleteApp, deleteAppSync,
 
-  getApps, getAppsSync, 
+  getApps, getAppsSync, startApp,
 
   getServices, getServicesSync,
   createService, createServiceSync,
   deleteService, deleteServiceSync,
 
   getServiceInfo, getServiceInfoSync,
+
+  setEnv, getEnv,
+
 
   readlineSync,
 

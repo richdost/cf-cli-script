@@ -1,0 +1,14 @@
+---
+applications:
+  - name: test-app-for-cf-cli-script
+    memory: 32M
+    timeout: 180
+    buildpack: nodejs_buildpack
+    command: node ./index.js
+#services:
+ # - your-name-uaa
+ # - your-name-time-series
+ # - your-name-asset
+env:
+    test_env_1: foo
+    test_env_2: bar

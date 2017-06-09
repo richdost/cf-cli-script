@@ -1,0 +1,16 @@
+{
+  "name": "test-app-for-cf-cli-script",
+  "version": "1.0.0",
+  "description": "app for testing cf-cli-script",
+  "main": "index.js",
+  "scripts": {
+    "push": "cf push test-app-for-cf-cli-script -c \"node ./index.js\"",
+    "delete": "cf delete test-app-for-cf-cli-script -f",
+    "start": "node ./index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
+}
