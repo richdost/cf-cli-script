@@ -20,7 +20,7 @@ catch (e){
 
 function setEnv(appName,name,value){
   return new Promise((resolve, reject) => {
-    cmd(`cf set-env ${appName} ${name} ${value}`)
+    cmd(`cf set-env ${appName} ${name} '${value}'`)
     .catch(reject)
     .then(output => {
             console.log('cf set-env output:\n' + output);
