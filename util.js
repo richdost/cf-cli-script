@@ -70,10 +70,23 @@ function requestP(options){
   });
 }
 
+function log(msg){
+  console.log(msg);
+}
+
+function logWarning(msg){
+  console.log(goYellow + msg + goNormal);
+}
+
+function logError(msg){
+  console.log(goRed + msg + goRed);
+}
+
 module.exports = {
   cleanArray,
   cmd, cmdSync,
   readlineSync,
   goYellow, goNormal, goCyan, goRed, goPink, goGreen,
   requestP,
+  log, logWarning, logError,
 };
