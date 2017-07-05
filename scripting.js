@@ -18,23 +18,31 @@ catch (e){
 }
 
 // facade to util.cmd adding logging
+var zebraToggle = true;
+var zebraColors = {true: util.goCyan, false: util.goGreen};
+function getZebra(){
+  zebraToggle = !zebraToggle;
+  return zebraColors[zebraToggle];
+}
 function cmd(s){
   return new Promise((resolve, reject) => {
     util.cmd(s)
     .catch(result => {  // result is {command, error, stdout, stderr}
-      console.log(util.goRed + '--- error ---');
-      console.log(util.goYellow + result.command);
+      console.log(util.goRed);
+      console.log('--- error command ---');
+      console.log(result.command);
       if (result.error) console.log('error: ' + result.error);
       if (result.stderr) console.log('stderr: ' + result.stderr);
       if (result.stdout) console.log('stdout: ' + result.stdout);
-      console.log('--- end error report ---' + util.goNormal);
+      console.log('--- end of error command and result ---' + util.goNormal);
       reject(result.error);
     })
     .then(result => {  // result is {command, stdout}
-      console.log(util.goNormal + '--- command and result ---');
-      console.log(util.goCyan + result.command);
-      console.log(util.goNormal + result.stdout);
-      console.log('--- end of command and result ---');
+      console.log(getZebra());
+      console.log('--- command and result ---');
+      console.log(result.command);
+      console.log(result.stdout);
+      console.log('--- end of command and result ---' + util.goNormal);
       resolve(result.stdout);
     });
   });
