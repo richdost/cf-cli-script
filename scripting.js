@@ -19,7 +19,7 @@ catch (e){
 
 // facade to util.cmd adding logging
 var zebraToggle = true;
-var zebraColors = {true: util.goCyan, false: util.goGreen};
+var zebraColors = {true: util.goCyan, false: util.goBlue};
 function getZebra(){
   zebraToggle = !zebraToggle;
   return zebraColors[zebraToggle];
