@@ -3,7 +3,6 @@ var process = require('process');
 var uuid = require('uuid');
 var util = require('./util.js');
 var cleanArray = util.cleanArray;
-var cmd = util.cmd;
 var cmdSync = util.cmdSync;
 var readlineSync = util.readlineSync;
 
@@ -16,6 +15,29 @@ try {
 catch (e){
   console.log(util.goRed + e + util.goNormal);
   process.exit(1);
+}
+
+// facade to util.cmd adding logging
+function cmd(s){
+  return new Promise((resolve, reject) => {
+    util.cmd(s)
+    .catch(result => {  // result is {command, error, stdout, stderr}
+      console.log(util.goRed + '--- error ---');
+      console.log(util.goYellow + result.command);
+      if (result.error) console.log('error: ' + result.error);
+      if (result.stderr) console.log('stderr: ' + result.stderr);
+      if (result.stdout) console.log('stdout: ' + result.stdout);
+      console.log('--- end error report ---' + util.goNormal);
+      reject(result.error);
+    })
+    .then(result => {  // result is {command, stdout}
+      console.log(util.goNormal + '--- command and result ---');
+      console.log(util.goCyan + result.command);
+      console.log(util.goNormal + result.stdout);
+      console.log('--- end of command and result ---');
+      resolve(result.stdout);
+    });
+  });
 }
 
 function setEnv(appName,name,value){

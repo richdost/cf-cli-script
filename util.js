@@ -13,31 +13,27 @@ const goRed = '\x1b[31m';
 const goPink = '\x1b[35m';
 const goGreen = '\x1b[32m';
 
-function cleanArray(a){
-  var rtn = [];
-  a.forEach(elem => elem.length && rtn.push(elem));
-  return rtn;
-}
 
-// Executes command in subprocess. Returns promise that resolves when done.
+
+// Executes command in subprocess. Returns promise that resolves to {command, stdout} or rejects to {command, error, stdout, stderr}.
 function cmd(command){
   return new Promise((resolve, reject) => {
     exec(command, function(error, stdout, stderr) {
-      if (error) reject(error);
-      else resolve(stdout);
+      if (error) reject({command, error, stdout, stderr});
+      else resolve({command, stdout});
     });
   });
 }
 
 function cmdSync(command, timeout = 20000){
-  console.log(goCyan + command + ' ' + goNormal);
+  //console.log(goCyan + command + ' ' + goNormal);
   var output;
   try {
     output = execSync(command, { timeout: timeout }).toString();
-    if (output){
-      console.log(output);
-      console.log('---');
-    }
+    // if (output){
+    //   console.log(output);
+    //   console.log('---');
+    // }
   }
   catch (e) {
     console.log('error caught with e:' + e);
@@ -70,16 +66,22 @@ function requestP(options){
   });
 }
 
-function log(msg){
-  console.log(msg);
-}
+// function log(msg){
+//   console.log(msg);
+// }
 
-function logWarning(msg){
-  console.log(goYellow + msg + goNormal);
-}
+// function logWarning(msg){
+//   console.log(goYellow + msg + goNormal);
+// }
 
-function logError(msg){
-  console.log(goRed + msg + goRed);
+// function logError(msg){
+//   console.log(goRed + msg + goRed);
+// }
+
+function cleanArray(a){
+  var rtn = [];
+  a.forEach(elem => elem.length && rtn.push(elem));
+  return rtn;
 }
 
 module.exports = {
@@ -88,5 +90,5 @@ module.exports = {
   readlineSync,
   goYellow, goNormal, goCyan, goRed, goPink, goGreen,
   requestP,
-  log, logWarning, logError,
+  //log, logWarning, logError,
 };
