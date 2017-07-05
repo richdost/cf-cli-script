@@ -12,6 +12,7 @@ const goCyan = '\x1b[36m';
 const goRed = '\x1b[31m';
 const goPink = '\x1b[35m';
 const goGreen = '\x1b[32m';
+const goBrown = '\x1b[33m';
 const goBlue = '\x1b[34m';
 
 
@@ -89,7 +90,7 @@ module.exports = {
   cleanArray,
   cmd, cmdSync,
   readlineSync,
-  goYellow, goNormal, goCyan, goRed, goPink, goGreen, goBlue,
+  goYellow, goNormal, goCyan, goRed, goPink, goGreen, goBlue, goBrown,
   requestP,
   //log, logWarning, logError,
 };
