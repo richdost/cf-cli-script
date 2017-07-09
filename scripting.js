@@ -27,11 +27,13 @@ function getZebra(){
 }
 function getCommandCount(){ return commandCounter++; }
 function cmd(s){
+  var commandNumber = getCommandCount();
+  console.log(util.goGreen + 'Doing command #' + commandNumber + ': ' + s + util.goNormal);
   return new Promise((resolve, reject) => {
     util.cmd(s)
     .catch(result => {  // result is {command, error, stdout, stderr}
       console.log(util.goRed);
-      console.log('--- error command #' + getCommandCount() + ' ---');
+      console.log('--- error command #' + commandNumber + ' ---');
       console.log(result.command);
       if (result.error) console.log('error: ' + result.error);
       if (result.stderr) console.log('stderr: ' + result.stderr);
@@ -41,7 +43,7 @@ function cmd(s){
     })
     .then(result => {  // result is {command, stdout}
       console.log(getZebra());
-      console.log('--- command #' + getCommandCount() + ' ---');
+      console.log('--- command #' + commandNumber + ' ---');
       console.log(result.command);
       console.log(result.stdout);
       console.log('--- end of command and result ---' + util.goNormal);
