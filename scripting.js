@@ -368,25 +368,8 @@ function deleteServiceSync(serviceName){
   return cmdSync(`cf delete-service ${serviceName} -f`);
 }
 
-function deleteService(serviceName, repeat = false){
-  return new Promise((resolve, reject) => {
-    cmd(`cf delete-service ${serviceName} -f`)
-    .then((command, stdout) => {
-      if (!repeat && stdout.includes('Failed') && stdout.includes('service keys and bindings must first be deleted')){
-        cmd(`cf delete-service-key ${serviceName} ${serviceName}-key -f`)
-        .then(() => {
-          deleteService(serviceName, true)
-          .then(() => resolve())
-          .catch(error => reject(error));
-        })
-        .catch(error => reject(error));
-      }
-      else resolve(stdout);
-    })
-    .catch((command, error, stdout, stderr) => {
-      reject(error);
-    });
-  });
+function deleteService(serviceName){
+  return cmd(`cf delete-service ${serviceName} -f`);
 }
 
 // TODO return map instead of array
