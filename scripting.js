@@ -368,8 +368,25 @@ function deleteServiceSync(serviceName){
   return cmdSync(`cf delete-service ${serviceName} -f`);
 }
 
-function deleteService(serviceName){
-  return cmd(`cf delete-service ${serviceName} -f`);
+function deleteService(serviceName, repeat = false){
+  return new Promise((resolve, reject) => {
+    cmd(`cf delete-service ${serviceName} -f`)
+    .then((command, stdout) => {
+      if (!repeat && stdout.includes('Failed') && stdout.includes('service keys and bindings must first be deleted')){
+        cmd(`cf delete-service-key ${serviceName} ${serviceName}-key -f`)
+        .then(() => {
+          deleteService(serviceName, true)
+          .then(() => resolve())
+          .catch(error => reject(error));
+        })
+        .catch(error => reject(error));
+      }
+      else resolve(stdout);
+    })
+    .catch((command, error, stdout, stderr) => {
+      reject(error);
+    });
+  });
 }
 
 // TODO return map instead of array
@@ -391,7 +408,7 @@ function getServiceInfoSync(serviceName){
 }
 
 function getServiceInfo(serviceName){
-  var keyName = serviceName + '-key-' + uuid.v1();
+  var keyName = serviceName + '-key';  // + uuid.v1();
   return new Promise((resolve, reject) => {
     cmd(`cf create-service-key ${serviceName} ${keyName}`)
     .catch(reject)
