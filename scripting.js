@@ -391,7 +391,7 @@ function getServiceInfoSync(serviceName){
 }
 
 function getServiceInfo(serviceName){
-  var keyName = serviceName + '-key';  // + uuid.v1();
+  var keyName = serviceName; // + '-key-' + uuid.v1();
   return new Promise((resolve, reject) => {
     cmd(`cf create-service-key ${serviceName} ${keyName}`)
     .catch(reject)
