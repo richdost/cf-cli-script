@@ -399,7 +399,8 @@ function getServiceInfo(serviceName){
       cmd(`cf service-key ${serviceName} ${keyName}`)
       .catch(error =>{
         cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
-        .catch(() => reject(error)).then(() => reject(error));
+        .catch(() => reject({serviceName, error}))
+        .then(() => reject({serviceName, error}));
       })
       .then(output => {
         var rows = output.split('\n');
@@ -407,8 +408,8 @@ function getServiceInfo(serviceName){
         var info = rows.join('');
         info = JSON.parse(info);
         cmd(`cf delete-service-key ${serviceName} ${keyName} -f`)
-        .catch(() => resolve(info))
-        .then(() => resolve(info));
+        .catch(() => resolve({serviceName, info}))
+        .then(() => resolve({serviceName, info}));
       });
     });
   });
