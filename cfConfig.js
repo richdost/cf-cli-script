@@ -23,6 +23,7 @@ function initSync(){
   if (!fs.existsSync(configFilePath)) throw new Error('Error: Please do cf login');
   config = jsonFile.readFileSync(configFilePath, {throws: false}) || null;
   if (!config) throw new Error('Error: Failed to read ~/.cf/config.json.');
+  process.env.UV_THREADPOOL_SIZE = 10;  // up number of threads for node - see https://www.future-processing.pl/blog/on-problems-with-threads-in-node-js/
   return config;
 }
 
